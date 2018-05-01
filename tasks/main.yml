@@ -1,0 +1,74 @@
+---
+- name: install kibana
+  become: yes
+  yum:
+    name: kibana-{{ kibana_pkg_version }}
+    state: installed
+
+- name: Check for intalled plugins
+  command: "/usr/share/kibana/bin/kibana-plugin list"
+  register: kibana_installed_plugins
+  changed_when: false
+
+- name: install X-Pack
+  become: yes
+  command: "/usr/share/kibana/bin/kibana-plugin install http://artifactory.reform.hmcts.net/artifactory/non-RPM/x-pack-{{ kibana_plugin_version }}.zip"
+  when: kibana_installed_plugins.stdout.find('x-pack') == -1
+
+- name: Install Sentinl Plugin
+  command: "/usr/share/kibana/bin/kibana-plugin install https://artifactory.reform.hmcts.net/artifactory/non-RPM/sentinl-v{{ kibana_plugin_version }}.zip"
+  become: yes
+  when: kibana_installed_plugins.stdout.find('sentinl') == -1
+
+- name: set kibana configuration
+  become: yes
+  template:
+    src: kibana.yml.j2
+    dest: /etc/kibana/kibana.yml
+    owner: root
+    group: kibana
+    mode: 0660
+  notify:
+    - restart kibana
+
+- name: start kibana on boot
+  become: yes
+  service:
+    name: kibana
+    enabled: yes
+    state: started
+
+- name: Ensure certs directory exists
+  file:
+    dest: "/etc/kibana/certs"
+    state: directory
+    owner: root
+    group: kibana
+    mode: 0775
+
+- name: copy SSL cert
+  become: yes
+  copy:
+    dest: "{{ kibana_ssl_crt_location }}"
+    content: "{{ kibana_ssl_crt }}"
+    owner: root
+    group: kibana
+    mode: 0644
+
+- name: copy SSL key
+  become: yes
+  copy:
+    dest: "{{ kibana_ssl_key_location }}"
+    content: "{{ kibana_ssl_key }}"
+    owner: root
+    group: kibana
+    mode: 0640
+
+- name: copy SSL CA
+  become: yes
+  copy:
+    dest: "{{ kibana_ssl_ca_location }}"
+    content: "{{ kibana_ssl_ca }}"
+    owner: root
+    group: kibana
+    mode: 0644

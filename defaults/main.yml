@@ -1,0 +1,25 @@
+---
+# Package and plugin versions needs to match main Elasticstack version
+kibana_pkg_version: "{{ elasticstack_version }}"
+kibana_plugin_version: "{{ elasticstack_version }}"
+
+# Only accept connections via the loopback on the default port
+kibana_server_host: 127.0.0.1
+kibana_server_port: 5601
+
+kibana_server_name: kibana.example.com
+
+# Where to look for Elasticsearch.  By default assume it's on localhost
+kibana_elasticsearch_url: "https://127.0.0.1:9200"
+
+# Replace/override with SearchGuard configured credentials
+elk_sg_kibana_user: ""
+elk_sg_kibana_user_password: ""
+
+# Certificate information
+kibana_ssl_key_location: "/etc/kibana/certs/reform.hmcts.net.key"
+kibana_ssl_crt_location: "/etc/kibana/certs/reform.hmcts.net.crt"
+kibana_ssl_ca_location: "/etc/kibana/certs/reform.hmcts.net.ca"
+kibana_ssl_key: ""
+kibana_ssl_crt: ""
+kibana_ssl_ca: ""

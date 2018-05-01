@@ -1,0 +1,32 @@
+---
+- hosts: all
+  tasks:
+    - name: Install testing requirements
+      package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - curl
+        - openssl
+    - name: Generate test certificate and key
+      command: "openssl req -x509 -newkey rsa:4096 -sha256 -nodes -keyout /hmcts.key -out  /hmcts.crt -subj /CN=elktest.local -days 3650"
+      args:
+        creates: "/hmcts.*"
+    - name: Slurp certificate
+      slurp:
+        src: /hmcts.crt
+      register: crtslurp
+    - name: Slurp key
+      slurp:
+        src: /hmcts.key
+      register: keyslurp
+
+- hosts: all
+  remote_user: root
+  vars:
+   kibana_pkg_version: 6.2.1
+   kibana_plugin_version: 6.2.1
+   kibana_ssl_crt: "{{ crtslurp['content'] | b64decode }}"
+   kibana_ssl_key: "{{ keyslurp['content'] | b64decode }}"
+  roles:
+    - kibana-role

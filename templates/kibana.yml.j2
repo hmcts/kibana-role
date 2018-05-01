@@ -1,0 +1,16 @@
+server.host: {{ kibana_server_host }}
+server.name: {{ kibana_server_name }}
+server.port: {{ kibana_server_port }}
+server.ssl.key: {{ kibana_ssl_key_location }}
+server.ssl.cert: {{ kibana_ssl_crt_location }}
+
+elasticsearch.url: {{ kibana_elasticsearch_url }}
+elasticsearch.ssl.certificateAuthorities: {{ kibana_ssl_ca_location }}
+elasticsearch.ssl.verificationMode: none
+
+elasticsearch.username: {{ elk_sg_kibana_user }}
+elasticsearch.password: {{ elk_sg_kibana_user_password }}
+
+kibana_server_name: kibana.reform.hmcts.net
+
+xpack.security.enabled: false
